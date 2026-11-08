@@ -1,0 +1,51 @@
+# =============================================================================
+# prometheus.yml — Prometheus scrape configuration for the capstone app
+# The app exposes Prometheus-format metrics at GET /metrics.
+# See README-monitoring.md in this folder for the full monitoring guide.
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alert rules (uptime / service-down detection)
+rule_files:
+  - "alert-rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            # Add an Alertmanager target here if you run one, e.g.
+            # "alertmanager:9093". The free uptime checker described in
+            # README-monitoring.md covers alerting for this capstone.
+            []
+
+scrape_configs:
+  # --- The capstone application -------------------------------------------
+  - job_name: "rabtech-capstone"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          # Local Docker run: the app container published on host port 8000
+          # (from the host, Prometheus reaches it via host.docker.internal
+          # when Prometheus itself runs in a container; use localhost:8000
+          # when Prometheus runs directly on the host).
+          - "host.docker.internal:8000"
+        labels:
+          app: "rabtech-capstone"
+          env: "production"
+
+  # To monitor the DEPLOYED instance instead, replace the target above with
+  # the cloud endpoint and switch to HTTPS:
+  #
+  #   - job_name: "rabtech-capstone-cloud"
+  #     metrics_path: /metrics
+  #     scheme: https
+  #     static_configs:
+  #       - targets: ["rabtech-capstone.onrender.com"]
+
+  # --- Prometheus self-monitoring ------------------------------------------
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

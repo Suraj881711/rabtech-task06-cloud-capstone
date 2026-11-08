@@ -1,0 +1,36 @@
+# =============================================================================
+# alert-rules.yml — Prometheus alert rules for the capstone service
+# Loaded via rule_files in prometheus.yml.
+# =============================================================================
+
+groups:
+  - name: capstone-uptime
+    interval: 30s
+    rules:
+      # Primary uptime alert: the scrape target is down, i.e. the health
+      # of the service can no longer even be measured — Prometheus marks
+      # the built-in "up" metric as 0 when /metrics is unreachable.
+      - alert: ServiceDown
+        expr: up{job="rabtech-capstone"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Capstone service is DOWN (job {{ $labels.job }})"
+          description: >-
+            Prometheus has been unable to scrape {{ $labels.instance }}
+            for more than 1 minute. The application or its host is down;
+            check the deployment and the /health endpoint.
+
+      # Secondary signal: metrics have disappeared entirely (e.g. the app
+      # is up but /metrics broke after a deploy).
+      - alert: MetricsMissing
+        expr: absent(http_requests_total{job="rabtech-capstone"})
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No application metrics from the capstone service"
+          description: >-
+            http_requests_total has not been reported for 2 minutes,
+            although the target may still be reachable. Check /metrics.
