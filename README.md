@@ -11,9 +11,15 @@ alerts.
 
 ## Live endpoint
 
-> **Live cloud application URL:** _to be filled in after deployment_
+> **Live cloud application URL:** https://rabtech-capstone.onrender.com
 >
-> - Service info: `<LIVE_URL>/`
+> - Service info: https://rabtech-capstone.onrender.com/
+> - Health check: https://rabtech-capstone.onrender.com/health → `{"status": "ok"}`
+> - Metrics: https://rabtech-capstone.onrender.com/metrics
+> - Hosted on Render (free Docker web service, deployed from this repository via the
+>   `render.yaml` Blueprint; auto-deploys on every push to `main`).
+> - Note: the free instance spins down when idle, so the first request after a quiet
+>   period can take up to ~50 seconds to respond while it wakes up.
 > - Health check: `<LIVE_URL>/health`
 > - Metrics: `<LIVE_URL>/metrics`
 
