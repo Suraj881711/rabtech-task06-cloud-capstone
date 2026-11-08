@@ -1,0 +1,28 @@
+# =============================================================================
+# render.yaml — Render Blueprint (Infrastructure as Code)
+# Deploys this repository as a free Docker web service.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Usage: Render Dashboard -> New -> Blueprint -> connect this repo.
+# Render reads this file, builds the Dockerfile and deploys the service.
+# =============================================================================
+
+services:
+  - type: web
+    name: rabtech-capstone
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    # Render polls this path; the deploy only goes live when it returns 200
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Environment-variable based configuration — no code change is
+      # needed to reconfigure the service, just edit these in the
+      # Render dashboard (or here) and redeploy.
+      - key: APP_NAME
+        value: rabtech-capstone
+      - key: APP_ENV
+        value: production
+      # PORT is provided automatically by Render at runtime; the
+      # Dockerfile's gunicorn command binds to it.
